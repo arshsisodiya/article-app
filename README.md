@@ -2,85 +2,6 @@
 
 A modern, full-stack web application demonstrating secure authentication and Role-Based Access Control (RBAC). Built with Node.js, Express, MongoDB, and React.
 
-## 🚀 Project Overview
-
-This system provides a secure platform where users can signup, login, and manage articles based on their assigned roles (**Admin**, **Editor**, **Viewer**). It features a dark glassmorphic UI, persistent cloud storage via MongoDB Atlas, and is fully mobile-responsive.
-
----
-
-## 🏗️ Architecture Overview
-
-The project follows a **Client-Server Architecture** with a clear separation of concerns:
-
-- **Frontend (React/Vite)**: A Single Page Application (SPA) using `React Context` for centralized Auth state and `React Router` for navigation guards.
-- **Backend (Node/Express)**: A RESTful API designed for serverless environments (Vercel). It uses modular routing and middleware-based security.
-- **Database (MongoDB Atlas)**: Cloud-hosted NoSQL database using **Mongoose** for data modeling and relationship management.
-- **Security Layer**: 
-    - **Authentication**: Stateless JWT (JSON Web Tokens).
-    - **Password Security**: Adaptive hashing using `bcryptjs`.
-    - **Authorization**: Custom middleware layer enforcing access control before requests reach the controller.
-
----
-
-## 🗄️ Database Schema
-
-### Users Collection
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| **`name`** | `String` | User's display name. |
-| **`email`** | `String` | Unique, lowercase email address. |
-| **`password`** | `String` | Hashed password (secured via `bcryptjs`). |
-| **`role`** | `String` | Access level: `admin`, `editor`, or `viewer`. |
-
-### Articles Collection
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| **`title`** | `String` | Trimmed title of the article. |
-| **`content`** | `String` | Main body of the article. |
-| **`createdBy`** | `ObjectId` | Reference to the **User** document. |
-| **`authorName`** | `String` | Cached creator name for UI performance. |
-
----
-
-### Prerequisites
-- Node.js (v18+)
-- npm or yarn
-- A MongoDB Atlas connection string
-
-### 1. Installation
-```bash
-# Install root dependencies (concurrently scripts)
-npm install
-
-# Install backend dependencies
-cd backend && npm install
-
-# Install frontend dependencies
-cd ../frontend && npm install
-```
-
-### 2. Configuration
-Create a `.env` file in the `backend/` directory:
-```env
-MONGODB_URI=your_mongodb_atlas_uri
-JWT_SECRET=your_secure_random_key
-NODE_ENV=development
-```
-
-### 3. Database Initialization
-Populate the database with demo accounts and initial roles:
-```bash
-cd backend
-npm run seed
-```
-
-### 4. Running Locally
-You can run both servers simultaneously from the root directory:
-```bash
-npm run dev:backend   # Starts API at http://localhost:5000
-npm run dev:frontend  # Starts React at http://localhost:5173
-```
-
 ---
 
 ## 🔐 How Authentication Works
@@ -103,58 +24,109 @@ The system uses a **multi-layered approach** to ensure security:
 - **Frontend (UI/UX Layer)**: 
     - The `AuthContext` provides permission flags like `canCreate` or `canDelete`.
     - We use these to conditionally render buttons, links, and navigation items.
-    - `ProtectedRoute` components wrap sensitive pages to redirect unauthorized users back to the dashboard.
-
----
-
-## 📡 API Flow Explanation
-
-Here is the lifecycle of a typical protected request (e.g., Creating an Article):
-
-1. **Frontend**: User submits the form. The `api()` wrapper in `AuthContext` automatically attaches the JWT to the `Authorization` header.
-2. **Backend (Middleware 1)**: `authenticate` validates the JWT and extracts the user's role.
-3. **Backend (Middleware 2)**: `authorize(['admin', 'editor'])` checks if the role has "write" permissions.
-4. **Backend (Controller)**: The request reaches the route handler, which saves the article to MongoDB.
-5. **Database**: Mongoose saves the document with the `createdBy` field populated from `req.user.name`.
+    - `ProtectedRoute` components wrap sensitive pages to prevent unauthorized access.
 
 ---
 
 ## 🧪 How to Test Each Role
 
-Use the following test accounts to verify role-based behavior:
+Use the following test accounts (already seeded) to verify role-based behavior:
 
 | Role | Permissions | Testing Instructions |
 |------|-------------|----------------------|
-| **Admin** | Full Access | Login as `admin@test.com`. You can manage users, change roles, and delete any article. |
-| **Editor** | Write & Read | Login as `editor@test.com`. You can create new articles, but you cannot delete them or see the User Management page. |
-| **Viewer** | Read Only | Login as `viewer@test.com`. You can only read articles. All "New", "Edit", and "Delete" actions are hidden. |
+| **Admin** | Full Access | Login as `admin@test.com` (password: `password`). You can manage users, change roles, and delete any article. |
+| **Editor** | Write & Read | Login as `editor@test.com` (password: `password`). You can create/edit articles, but cannot delete them or access User Management. |
+| **Viewer** | Read Only | Login as `viewer@test.com` (password: `password`). You can read articles, but all management actions are hidden. |
 
 ---
 
-## 🚀 Walkthrough Guide & Assumptions
+## 🚀 Project Setup Instructions
+
+### Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas connection string
+
+### 1. Installation
+```bash
+# Install root dependencies
+npm install
+
+# Install backend dependencies
+cd backend && npm install
+
+# Install frontend dependencies
+cd ../frontend && npm install
+```
+
+### 2. Configuration
+Create a `.env` file in the `backend/` directory:
+```env
+MONGODB_URI=your_mongodb_atlas_uri
+JWT_SECRET=your_secure_random_key
+NODE_ENV=development
+```
+
+### 3. Database Initialization
+Populate the database with demo accounts:
+```bash
+cd backend
+npm run seed
+```
+
+### 4. Running Locally
+Run both servers from the root directory:
+```bash
+npm run dev:backend   # Starts API at http://localhost:5000
+npm run dev:frontend  # Starts React at http://localhost:5173
+```
+
+---
+
+## 🏗️ Architecture Overview
+
+The project follows a **Client-Server Architecture** with a clear separation of concerns:
+
+- **Frontend (React/Vite)**: A Single Page Application (SPA) using `React Context` for Auth state and `React Router` for navigation guards.
+- **Backend (Node/Express)**: A RESTful API designed for serverless environments. It uses modular routing and middleware-based security.
+- **Database (MongoDB Atlas)**: Cloud-hosted NoSQL database using **Mongoose** for data modeling.
+- **Security Layer**: Stateless JWT authentication, adaptive hashing with `bcryptjs`, and custom authorization middleware.
+
+---
+
+## 📡 API Flow Explanation
+
+Lifecycle of a typical protected request (e.g., Creating an Article):
+
+1. **Frontend**: User submits a form. The API wrapper attaches the JWT to the `Authorization` header.
+2. **Backend (Middleware 1)**: `authenticate` validates the JWT and extracts the user's identity.
+3. **Backend (Middleware 2)**: `authorize(['admin', 'editor'])` checks for sufficient permissions.
+4. **Backend (Controller)**: The request reaches the route handler, which performs the database operation.
+5. **Database**: Mongoose saves the document, ensuring data integrity.
+
+---
+
+## 🛰️ Walkthrough & Assumptions
 
 ### Walkthrough
-1. **Explore as Viewer**: Log in with the Viewer account. Notice how the "User Management" sidebar and "New Article" buttons are invisible.
+1. **Explore as Viewer**: Log in with the Viewer account. Notice how the "User Management" sidebar and "New Article" buttons are hidden.
 2. **Promote a User**: Log in as Admin. Go to the "Users" page. Find a User and change their role to "Editor".
-3. **Create Content**: Log in with that updated user (or the default Editor). Create an article and see it appear in the global feed.
-4. **Delete Content**: Log in as Admin and delete the test article to see the restricted action in effect.
+3. **Create Content**: Log in with that updated user. Create an article and see it appear in the global feed.
+4. **Delete Content**: Log in as Admin and delete the test article to see Admin-only privileges in effect.
 
 ### Assumptions Made
-- **Token Expiry**: JWTs are set to expire in 8 hours to balance security and convenience.
-- **Role Hierarchy**: Roles are treated as discrete sets of permissions rather than a strict linear hierarchy (though Admin encompasses all).
-- **Default Role**: Any new self-registered user is assigned the `viewer` role by default to prevent privilege escalation.
-- **Frontend Security**: While UI elements are hidden, we assume the user understands that **true security is enforced on the backend** via middleware.
+- **Token Expiry**: JWTs are set to expire in 8 hours to balance security and UX.
+- **Default Role**: New self-registered users are assigned the `viewer` role by default.
+- **Statelessness**: No session data is stored on the server; all identity info is contained within the JWT.
+- **Role Hierarchy**: While Admin has more permissions than Editor, permissions are defined by explicit lists of allowed roles for each action.
 
 ---
 
-## 🌐 Hosting on Vercel
+## 🌐 Deployment (Vercel)
 
-### 1. Deploy the Backend
+### 1. Backend
 - Set **Root Directory** to `backend`.
-- Add Env: `MONGODB_URI`, `JWT_SECRET`, `NODE_ENV=production`.
-- **Note**: The backend contains a `vercel.json` to handle serverless routing and a public `/` route for status checks.
+- Configure Env: `MONGODB_URI`, `JWT_SECRET`, `NODE_ENV=production`.
 
-### 2. Deploy the Frontend
+### 2. Frontend
 - Set **Root Directory** to `frontend`.
-- Add Env: `VITE_API_BASE_URL` (Pointing to your deployed backend URL **without** a trailing slash).
-- Vite will automatically build the SPA; `vercel.json` ensures all routes redirect to `index.html`.
+- Configure Env: `VITE_API_BASE_URL` (Deploved backend URL).
