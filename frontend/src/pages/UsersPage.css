@@ -107,6 +107,11 @@
   outline: none;
 }
 
+.role-select option {
+  background-color: #1e293b; /* Consistent dark background (Slate-800) */
+  color: var(--text-primary);
+}
+
 /* Responsive: card view on mobile */
 @media (max-width: 640px) {
   .users-table thead {
