@@ -1,121 +1,255 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useCallback, useEffect, useMemo, useState } from "react";
+import "./App.css";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const TOKEN_KEY = "rbac_assignment_token";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || "");
+  const [email, setEmail] = useState("admin@test.com");
+  const [password, setPassword] = useState("password");
+  const [loading, setLoading] = useState(false);
+  const [submittingArticle, setSubmittingArticle] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [articles, setArticles] = useState([]);
+  const [user, setUser] = useState(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  const role = user?.role || "";
+  const canCreate = role === "admin" || role === "editor";
+  const canDelete = role === "admin";
+
+  const roleCaption = useMemo(() => {
+    if (role === "admin") return "Can create and delete articles";
+    if (role === "editor") return "Can create articles";
+    if (role === "viewer") return "Can view articles only";
+    return "";
+  }, [role]);
+
+  const clearSession = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    setToken("");
+    setUser(null);
+    setArticles([]);
+  }, []);
+
+  const apiRequest = useCallback(async (path, options = {}) => {
+    const response = await fetch(`${API_BASE_URL}${path}`, options);
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
+
+    if (!response.ok) {
+      throw new Error(data.message || "Request failed");
+    }
+
+    return data;
+  }, []);
+
+  const loadArticles = useCallback(
+    async (activeToken = token) => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const data = await apiRequest("/articles", {
+          headers: {
+            Authorization: `Bearer ${activeToken}`,
+          },
+        });
+
+        setArticles(data.articles || []);
+        setUser(data.user || null);
+      } catch (requestError) {
+        setError(requestError.message);
+        clearSession();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [apiRequest, clearSession, token]
+  );
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    void loadArticles(token);
+  }, [loadArticles, token]);
+
+  async function handleLogin(event) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+
+    try {
+      const data = await apiRequest("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+
+      localStorage.setItem(TOKEN_KEY, data.token);
+      setToken(data.token);
+      setMessage("Login successful");
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleCreateArticle(event) {
+    event.preventDefault();
+    setSubmittingArticle(true);
+    setError("");
+    setMessage("");
+
+    try {
+      await apiRequest("/articles", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, content }),
+      });
+
+      setTitle("");
+      setContent("");
+      await loadArticles(token);
+      setMessage("Article created");
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSubmittingArticle(false);
+    }
+  }
+
+  async function handleDeleteArticle(articleId) {
+    setError("");
+    setMessage("");
+
+    try {
+      await apiRequest(`/articles/${articleId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      await loadArticles(token);
+      setMessage("Article deleted");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="shell">
+      <header className="hero-panel">
+        <p className="kicker">Developer Technical Assignment</p>
+        <h1>Role Based Access System</h1>
+        <p className="subtitle">Login and manage articles based on your role permissions.</p>
+      </header>
 
-      <div className="ticks"></div>
+      {!token && (
+        <section className="panel auth-panel">
+          <h2>Login</h2>
+          <form className="stack" onSubmit={handleLogin}>
+            <label>
+              Email
+              <input value={email} onChange={(event) => setEmail(event.target.value)} required />
+            </label>
+            <label>
+              Password
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+            </label>
+            <button type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+          <p className="hint">Demo roles: admin@test.com, editor@test.com, viewer@test.com (password: password)</p>
+        </section>
+      )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {token && (
+        <section className="panel dashboard-panel">
+          <div className="dashboard-head">
+            <div>
+              <h2>Articles Dashboard</h2>
+              <p className="role-line">
+                Logged in as <strong>{role || "unknown"}</strong> {roleCaption && <span>({roleCaption})</span>}
+              </p>
+            </div>
+            <button className="ghost" onClick={clearSession}>
+              Logout
+            </button>
+          </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          {canCreate && (
+            <form className="article-form" onSubmit={handleCreateArticle}>
+              <h3>Create Article</h3>
+              <label>
+                Title
+                <input value={title} onChange={(event) => setTitle(event.target.value)} required />
+              </label>
+              <label>
+                Content
+                <textarea
+                  rows="4"
+                  value={content}
+                  onChange={(event) => setContent(event.target.value)}
+                  required
+                />
+              </label>
+              <button type="submit" disabled={submittingArticle}>
+                {submittingArticle ? "Creating..." : "Create Article"}
+              </button>
+            </form>
+          )}
+
+          <div className="article-list-wrap">
+            <h3>All Articles</h3>
+            {loading ? (
+              <p>Loading articles...</p>
+            ) : (
+              <ul className="article-list">
+                {articles.map((article) => (
+                  <li key={article.id}>
+                    <div>
+                      <h4>{article.title}</h4>
+                      <p>{article.content}</p>
+                      <small>Created by {article.createdBy}</small>
+                    </div>
+                    {canDelete && (
+                      <button className="danger" onClick={() => handleDeleteArticle(article.id)}>
+                        Delete
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      )}
+
+      {(error || message) && (
+        <div className={`feedback ${error ? "error" : "success"}`}>{error || message}</div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
