@@ -29,7 +29,7 @@ router.get("/articles", authorize(["admin", "editor", "viewer"]), async (req, re
       id: a._id,
       title: a.title,
       content: a.content,
-      createdBy: a.createdBy,
+      createdBy: a.authorName,
     }));
 
     return res.json({
@@ -63,7 +63,8 @@ router.post("/articles", authorize(["admin", "editor"]), async (req, res) => {
     const article = await Article.create({
       title: title.trim(),
       content: content.trim(),
-      createdBy: req.user.name,
+      createdBy: req.user.id,
+      authorName: req.user.name,
     });
 
     return res.status(201).json({
@@ -71,7 +72,7 @@ router.post("/articles", authorize(["admin", "editor"]), async (req, res) => {
         id: article._id,
         title: article.title,
         content: article.content,
-        createdBy: article.createdBy,
+        createdBy: article.authorName,
       },
     });
   } catch (error) {

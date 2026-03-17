@@ -2,12 +2,6 @@
  * Seed script — populates MongoDB with default users and a welcome article.
  *
  * Usage: node src/scripts/seed.js
- *
- * This script:
- *   1. Connects to MongoDB using MONGODB_URI from .env
- *   2. Clears existing users and articles
- *   3. Creates 3 seed users (admin, editor, viewer)
- *   4. Creates 1 welcome article
  */
 require("dotenv").config();
 const mongoose = require("mongoose");
@@ -36,14 +30,6 @@ const seedUsers = [
   },
 ];
 
-const seedArticles = [
-  {
-    title: "Welcome Article",
-    content: "This article is visible to all authenticated roles.",
-    createdBy: "Admin User",
-  },
-];
-
 async function seed() {
   try {
     await connectDB();
@@ -54,16 +40,23 @@ async function seed() {
     await Article.deleteMany({});
     console.log("Cleared existing data");
 
-    /* Seed users (passwords are auto-hashed by the pre-save hook) */
+    /* Seed users */
     const createdUsers = await User.create(seedUsers);
-    console.log(`Created ${createdUsers.length} users:`);
-    createdUsers.forEach((u) => {
-      console.log(`  - ${u.email} (${u.role})`);
-    });
+    console.log(`Created ${createdUsers.length} users`);
 
-    /* Seed articles */
-    const createdArticles = await Article.create(seedArticles);
-    console.log(`Created ${createdArticles.length} article(s)`);
+    /* Find the admin user to link the welcome article */
+    const admin = createdUsers.find(u => u.role === "admin");
+
+    /* Seed articles with proper references */
+    await Article.create([
+      {
+        title: "Welcome Article",
+        content: "This article is visible to all authenticated roles.",
+        createdBy: admin._id,
+        authorName: admin.name,
+      },
+    ]);
+    console.log("Created welcome article");
 
     console.log("\nSeed complete!");
   } catch (error) {
