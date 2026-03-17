@@ -59,14 +59,18 @@ export default function SignupPage() {
 
       <div className="auth-left">
         <div className="auth-brand">
-          <div className="auth-brand-logo">
-            <Shield size={28} color="#fff" />
+          <div className="auth-brand-header">
+            <div className="auth-brand-logo">
+              <Shield size={28} color="#fff" />
+            </div>
+            <h1>Join the Platform</h1>
           </div>
-          <h1>Join the Platform</h1>
-          <p>
-            Create a viewer account to start reading articles.
-            Admins can upgrade your role later.
-          </p>
+          <div className="auth-brand-details">
+            <p>
+              Create a viewer account to start reading articles.
+              Admins can upgrade your role later.
+            </p>
+          </div>
         </div>
       </div>
 

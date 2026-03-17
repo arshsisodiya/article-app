@@ -40,26 +40,28 @@ export default function LoginPage() {
             </div>
             <h1>Role Based Access System</h1>
           </div>
-          <p>
-            Secure article management with granular role permissions.
-            Admin, Editor, and Viewer roles with JWT authentication.
-          </p>
-          <div className="auth-features">
-            <div className="auth-feature">
-              <div className="auth-feature-icon"><Shield size={18} /></div>
-              <span>JWT-based authentication & authorization</span>
-            </div>
-            <div className="auth-feature">
-              <div className="auth-feature-icon"><Users size={18} /></div>
-              <span>Three distinct roles: Admin, Editor, Viewer</span>
-            </div>
-            <div className="auth-feature">
-              <div className="auth-feature-icon"><FileText size={18} /></div>
-              <span>Full article CRUD with role-based access</span>
-            </div>
-            <div className="auth-feature">
-              <div className="auth-feature-icon"><Zap size={18} /></div>
-              <span>Real-time UI updates & feedback</span>
+          <div className="auth-brand-details">
+            <p>
+              Secure article management with granular role permissions.
+              Admin, Editor, and Viewer roles with JWT authentication.
+            </p>
+            <div className="auth-features">
+              <div className="auth-feature">
+                <div className="auth-feature-icon"><Shield size={18} /></div>
+                <span>JWT-based authentication & authorization</span>
+              </div>
+              <div className="auth-feature">
+                <div className="auth-feature-icon"><Users size={18} /></div>
+                <span>Three distinct roles: Admin, Editor, Viewer</span>
+              </div>
+              <div className="auth-feature">
+                <div className="auth-feature-icon"><FileText size={18} /></div>
+                <span>Full article CRUD with role-based access</span>
+              </div>
+              <div className="auth-feature">
+                <div className="auth-feature-icon"><Zap size={18} /></div>
+                <span>Real-time UI updates & feedback</span>
+              </div>
             </div>
           </div>
         </div>
