@@ -1,12 +1,20 @@
 {
   "name": "assignment",
   "version": "1.0.0",
-  "description": "",
+  "description": "Role based access technical assignment",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "start:backend": "npm --prefix backend run start",
+    "build:frontend": "npm --prefix frontend run build"
   },
-  "keywords": [],
+  "keywords": [
+    "rbac",
+    "jwt",
+    "react",
+    "express"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs"
