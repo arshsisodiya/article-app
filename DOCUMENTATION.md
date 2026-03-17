@@ -61,8 +61,9 @@ We use **Mongoose** to enforce a schema on MongoDB's flexible document structure
 
 - **Users Collection**: Stores permanent user documents.
     - *Example*: `{ name: "Admin", email: "admin@test.com", password: "$2b$10$hashed...", role: "admin" }`
+- **Article.js**: Article Schema. Defines title, content, an `ObjectId` reference to the creator (`createdBy`), and a cached author name (`authorName`) for display efficiency.
 - **Articles Collection**: Stores all generated content.
-    - *Example*: `{ title: "My First Article", content: "...", createdBy: "Admin" }`
+    - *Example*: `{ title: "My First Article", content: "...", createdBy: ObjectId("..."), authorName: "Admin User" }`
 
 ---
 

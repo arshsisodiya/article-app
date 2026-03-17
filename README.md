@@ -22,7 +22,25 @@ The project follows a **Client-Server Architecture** with a clear separation of 
 
 ---
 
-## 🛠️ Project Setup Instructions
+## 🗄️ Database Schema
+
+### Users Collection
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| **`name`** | `String` | User's display name. |
+| **`email`** | `String` | Unique, lowercase email address. |
+| **`password`** | `String` | Hashed password (secured via `bcryptjs`). |
+| **`role`** | `String` | Access level: `admin`, `editor`, or `viewer`. |
+
+### Articles Collection
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| **`title`** | `String` | Trimmed title of the article. |
+| **`content`** | `String` | Main body of the article. |
+| **`createdBy`** | `ObjectId` | Reference to the **User** document. |
+| **`authorName`** | `String` | Cached creator name for UI performance. |
+
+---
 
 ### Prerequisites
 - Node.js (v18+)
