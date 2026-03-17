@@ -44,95 +44,21 @@
 /* Article cards grid */
 .articles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
-.article-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: border-color 0.2s ease, transform 0.2s var(--ease-out);
-  animation: slideUp 0.4s var(--ease-out) both;
-}
-
-.article-card:hover {
-  border-color: var(--border-hover);
-  transform: translateY(-2px);
-}
-
-.article-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.article-card h4 {
-  font-size: 1.05rem;
-  margin: 0;
-  word-break: break-word;
-}
-
-.article-card-body {
-  font-size: 0.88rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.article-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-}
-
-.article-author {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.article-author-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--accent), #8b5cf6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.articles-count {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .articles-grid {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 480px) {
   .articles-header {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .articles-toolbar {
@@ -142,6 +68,10 @@
 
   .search-box input {
     width: 100%;
+  }
+
+  .article-card-header h4 {
+    font-size: 1rem;
   }
 }
 
@@ -156,7 +86,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 16px;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -166,77 +96,39 @@
   border-radius: var(--radius-xl);
   width: 100%;
   max-width: 680px;
-  max-height: 85vh;
+  max-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-lg), 0 0 60px rgba(99, 102, 241, 0.08);
   animation: scaleIn 0.3s var(--ease-out);
 }
 
-.article-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 28px 28px 0;
-}
-
-.article-modal-header h2 {
-  margin: 0;
-  font-size: 1.4rem;
-  word-break: break-word;
-}
-
-.article-modal-meta {
-  padding: 12px 28px 0;
-}
-
-.article-modal-meta .article-author {
-  font-size: 0.85rem;
-}
-
-.article-modal-meta .article-author-avatar {
-  width: 28px;
-  height: 28px;
-  font-size: 0.7rem;
-}
-
-.article-modal-body {
-  padding: 20px 28px;
-  flex: 1;
-  overflow-y: auto;
-  font-size: 0.95rem;
-  line-height: 1.8;
-  color: var(--text-secondary);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.article-modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 16px 28px 24px;
-  border-top: 1px solid var(--border);
-}
-
 @media (max-width: 480px) {
-  .article-modal-overlay {
-    padding: 12px;
-  }
-
   .article-modal {
-    max-height: 90vh;
-    border-radius: var(--radius-lg);
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
   }
 
-  .article-modal-header,
-  .article-modal-meta,
-  .article-modal-body,
+  .article-modal-overlay {
+    padding: 0;
+  }
+
+  .article-modal-header {
+    padding: 20px 20px 0;
+  }
+
+  .article-modal-meta {
+    padding: 8px 20px 0;
+  }
+
+  .article-modal-body {
+    padding: 16px 20px;
+    font-size: 0.9rem;
+  }
+
   .article-modal-footer {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding: 12px 20px 20px;
   }
 }
 

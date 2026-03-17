@@ -259,14 +259,17 @@
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    width: 280px; /* Wider for accessibility on touch */
   }
 
   .sidebar.open {
     transform: translateX(0);
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
   }
 
   .sidebar-overlay.open {
     display: block;
+    backdrop-filter: blur(4px);
   }
 
   .main-wrapper {
@@ -275,19 +278,33 @@
 
   .hamburger {
     display: flex;
+    margin-left: -6px;
   }
 
   .page-content {
-    padding: 20px 16px;
+    padding: 16px;
   }
 
   .navbar {
     padding: 0 16px;
+    height: 56px;
+  }
+
+  .navbar-title {
+    font-size: 0.95rem;
+  }
+
+  .navbar-role-label {
+    display: none; /* Hide 'Role:' text on small screens */
   }
 }
 
 @media (max-width: 480px) {
   .page-content {
-    padding: 16px 12px;
+    padding: 12px;
+  }
+  
+  .navbar-role {
+    gap: 4px;
   }
 }

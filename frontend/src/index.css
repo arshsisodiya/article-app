@@ -371,49 +371,34 @@ label {
   100% { background-position: 200% 0; }
 }
 
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.03) 50%, 
+    rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.4s var(--ease-out);
+/* Responsive adjustments for desktop/tablet/mobile */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 240px;
+  }
 }
 
-.animate-slide-up {
-  animation: slideUp 0.5s var(--ease-out);
+@media (max-width: 768px) {
+  :root {
+    --navbar-height: 56px;
+  }
 }
 
-/* ============================================
-   Utility
-   ============================================ */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--border-hover);
+@media (max-width: 480px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  
+  .btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
 }

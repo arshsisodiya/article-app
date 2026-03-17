@@ -34,10 +34,12 @@ export default function LoginPage() {
 
       <div className="auth-left">
         <div className="auth-brand">
-          <div className="auth-brand-logo">
-            <Shield size={28} color="#fff" />
+          <div className="auth-brand-header">
+            <div className="auth-brand-logo">
+              <Shield size={28} color="#fff" />
+            </div>
+            <h1>Role Based Access System</h1>
           </div>
-          <h1>Role Based Access System</h1>
           <p>
             Secure article management with granular role permissions.
             Admin, Editor, and Viewer roles with JWT authentication.
