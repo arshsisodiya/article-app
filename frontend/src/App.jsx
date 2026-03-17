@@ -20,12 +20,20 @@ function App() {
   const role = user?.role || "";
   const canCreate = role === "admin" || role === "editor";
   const canDelete = role === "admin";
+  const articleCount = articles.length;
 
   const roleCaption = useMemo(() => {
     if (role === "admin") return "Can create and delete articles";
     if (role === "editor") return "Can create articles";
     if (role === "viewer") return "Can view articles only";
     return "";
+  }, [role]);
+
+  const permissionSummary = useMemo(() => {
+    if (role === "admin") return ["View", "Create", "Delete"];
+    if (role === "editor") return ["View", "Create"];
+    if (role === "viewer") return ["View"];
+    return [];
   }, [role]);
 
   const clearSession = useCallback(() => {
@@ -189,12 +197,30 @@ function App() {
             <div>
               <h2>Articles Dashboard</h2>
               <p className="role-line">
-                Logged in as <strong>{role || "unknown"}</strong> {roleCaption && <span>({roleCaption})</span>}
+                Logged in as <span className={`role-badge ${role || "unknown"}`}>{role || "unknown"}</span>
+                {roleCaption && <span> {roleCaption}</span>}
               </p>
             </div>
             <button className="ghost" onClick={clearSession}>
               Logout
             </button>
+          </div>
+
+          <div className="stats-grid">
+            <article className="metric-card">
+              <p>Total Articles</p>
+              <strong>{articleCount}</strong>
+            </article>
+            <article className="metric-card">
+              <p>Your Permissions</p>
+              <div className="chip-row">
+                {permissionSummary.map((item) => (
+                  <span key={item} className="chip">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </article>
           </div>
 
           {canCreate && (
@@ -222,7 +248,12 @@ function App() {
           <div className="article-list-wrap">
             <h3>All Articles</h3>
             {loading ? (
-              <p>Loading articles...</p>
+              <p className="loading">Loading articles...</p>
+            ) : articles.length === 0 ? (
+              <div className="empty-state">
+                <h4>No articles yet</h4>
+                <p>Create the first article to get started.</p>
+              </div>
             ) : (
               <ul className="article-list">
                 {articles.map((article) => (
