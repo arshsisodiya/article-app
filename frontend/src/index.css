@@ -63,6 +63,7 @@
   line-height: 1.6;
   font-weight: 400;
   color: var(--text-primary);
+  color-scheme: dark; /* Signals browser to use dark native controls */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
