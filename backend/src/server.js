@@ -20,6 +20,19 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+/* ---------- Public Welcome Route ---------- */
+app.get("/", (_req, res) => {
+  res.json({ 
+    message: "RBAC Backend API is running",
+    endpoints: {
+      health: "/health",
+      auth: ["/signup", "/login"],
+      articles: "/articles",
+      users: "/users"
+    }
+  });
+});
+
 /* ---------- Health check ---------- */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
