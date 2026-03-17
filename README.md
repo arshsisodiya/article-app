@@ -1,146 +1,137 @@
-# Role Based Access System
+# Role-Based Access Control (RBAC) System
 
-A full-stack assignment project implementing JWT authentication and role based access control for article management.
+A modern, full-stack web application demonstrating secure authentication and Role-Based Access Control (RBAC). Built with Node.js, Express, MongoDB, and React.
 
-## Tech Stack
+## 🚀 Project Overview
 
-- Backend: Node.js, Express
-- Frontend: React (Vite)
-- Auth: JWT
-- Data: In-memory arrays (users and articles)
+This system provides a secure platform where users can signup, login, and manage articles based on their assigned roles (**Admin**, **Editor**, **Viewer**). It features a dark glassmorphic UI, persistent cloud storage via MongoDB Atlas, and is fully mobile-responsive.
 
-## Project Structure
+---
 
-- backend: Express API (login, articles, RBAC middleware)
-- frontend: React client (login screen + role-aware dashboard)
+## 🛠️ Project Setup Instructions
 
-## Setup Instructions
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- A MongoDB Atlas account (free tier)
 
-1. Install backend dependencies:
-
+### 1. Clone & Install Dependencies
 ```bash
+# Install root dependencies
+npm install
+
+# Install backend dependencies
 cd backend
 npm install
-```
 
-2. Install frontend dependencies:
-
-```bash
+# Install frontend dependencies
 cd ../frontend
 npm install
 ```
 
-3. Start backend server:
-
-```bash
-cd ../backend
-npm run dev
+### 2. Environment Configuration
+Create a `.env` file in the `backend/` directory:
+```env
+MONGODB_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_secure_random_secret
+PORT=5000
 ```
 
-4. Start frontend app in another terminal:
-
+### 3. Seed the Database
+Populate your MongoDB with the default roles and demo users:
 ```bash
-cd ../frontend
-npm run dev
+cd backend
+npm run seed
+```
+## Hosting on Vercel
+
+Since this project follows a monorepo structure (backend and frontend in separate folders), the best way to host on Vercel is to create two separate projects that point to the same repository but use different **Root Directories**.
+
+### 1. Deploy the Backend
+
+- Log in to your Vercel Dashboard and click **Add New > Project**.
+- Import this repository.
+- Give it a clear name (e.g., `rbac-backend`).
+- Set the **Root Directory** to `backend`.
+- **Environment Variables**: Add the following:
+  - `MONGODB_URI`: Your MongoDB connection string.
+  - `JWT_SECRET`: A secure random string for signing JWTs.
+  - `NODE_ENV`: Set to `production`.
+- Click **Deploy**.
+- **Copy the deployment URL** (e.g., `https://rbac-backend.vercel.app`).
+
+### 2. Deploy the Frontend
+
+- Import the repository again as a new Vercel project.
+- Give it a name (e.g., `rbac-frontend`).
+- Set the **Root Directory** to `frontend`.
+- Vercel should automatically detect the **Framework Preset** as **Vite**.
+- **Environment Variables**: Add:
+  - `VITE_API_BASE_URL`: **Paste the Backend URL** you copied in the previous step.
+- Click **Deploy**.
+
+### Manual Verification
+
+Once both are deployed, navigate to your frontend URL. Test the registration and login functionality to ensure there is a clear communication channel between the React app and the serverless backend.
+
+### 4. Run Locally
+You can run both from the root directory:
+```bash
+# In the root folder
+npm run dev:backend   # API starts at http://localhost:5000
+npm run dev:frontend  # React starts at http://localhost:5173
 ```
 
-5. Open the frontend URL shown by Vite (default: http://localhost:5173).
+---
 
-## Demo Credentials
+## 🏗️ Architecture Overview
 
-All users use the password `password`.
+The project follows a **Client-Server Architecture** with a clear separation of concerns:
 
-- Admin: admin@test.com
-- Editor: editor@test.com
-- Viewer: viewer@test.com
+- **Frontend (React)**: Component-based UI using `React Context` for global state (Auth) and `React Router` for navigation.
+- **Backend (Node/Express)**: Modular API with specialized middleware for security and validation.
+- **Database (MongoDB)**: Document-based cloud storage using **Mongoose** for schema modeling.
+- **Security**: JWT-based stateless authentication and **bcryptjs** for industry-standard password hashing.
 
-## Architecture Overview
+---
 
-### Backend
-
-- `POST /signup`: creates a new user account with `viewer` role.
-- `POST /login`: validates credentials from in-memory users and returns JWT.
-- `GET /articles`: accessible by admin, editor, viewer.
-- `POST /articles`: accessible by admin, editor.
-- `DELETE /articles/:id`: accessible by admin only.
-
-Core backend modules:
-
-- `authenticate` middleware:
-  - reads `Authorization: Bearer <token>`
-  - validates JWT
-  - attaches decoded user payload to request
-- `authorize` middleware:
-  - checks if the authenticated user role is in the route's allowed role list
-  - returns `403 Forbidden` when role is not allowed
-
-### Frontend
-
-- Login page sends credentials to `/login`.
-- JWT token is stored in localStorage.
-- Dashboard loads `/articles` with Bearer token.
-- UI actions are hidden by role:
-  - Admin: create + delete
-  - Editor: create only
-  - Viewer: view only
-
-## API Flow Explanation
-
-1. User submits login form.
-2. API returns a JWT if credentials are valid.
-3. Frontend stores token and requests articles with Bearer token.
-4. Backend authenticates token, extracts role, then applies authorization rules per route.
-5. Response is returned or denied with proper status codes.
-
-## Walkthrough Guide
+## 🔐 Authentication & RBAC Logic
 
 ### How Authentication Works
+1. **Login**: User submits credentials to `POST /login`.
+2. **JWT Generation**: Backend validates the user (via `bcrypt.compare`) and signs a JSON Web Token containing the user's `id`, `name`, and `role`.
+3. **Storage**: The frontend stores this JWT in `localStorage`.
+4. **Verification**: Every subsequent API request includes the token in the `Authorization: Bearer <token>` header. The `authenticate.js` middleware verifies this token before allowing the request to proceed.
 
-- Users log in through `POST /login`.
-- API signs a JWT containing user id, name, email, and role.
-- Protected routes require `Authorization: Bearer <token>`.
+### How Role-Based Permissions are Implemented
+- **Backend Enforcement**: A custom `authorize(allowedRoles)` middleware factory checks the user's role from the decoded JWT. If the role isn't in the allowed list, it immediately returns a `403 Forbidden` response.
+- **Frontend Enforcement**: The `useAuth` hook provides boolean flags (`isAdmin`, `canCreate`, `canDelete`). We use these to conditionally hide or disable UI elements (like the "Delete" button or "User Management" link) for users without permission.
 
-### How Role Permissions Are Implemented
+---
 
-- Each protected route includes role constraints via `authorize([...roles])`.
-- Unauthorized role access always returns `403 Forbidden`.
+## 🧪 How to Test Each Role
 
-### How To Test Each Role
+The easiest way to test is to use the **Quick Login** buttons on the login page:
 
-1. Login as `admin@test.com`:
-   - confirm article list loads
-   - create article succeeds
-   - delete article button is visible and works
-2. Login as `editor@test.com`:
-   - confirm article list loads
-   - create article succeeds
-   - delete button is hidden
-3. Login as `viewer@test.com`:
-   - confirm article list loads
-   - create form is hidden
-   - delete button is hidden
+| Role | Permissions | Testing Instructions |
+|------|-------------|----------------------|
+| **Admin** | Create, View, Delete, Manage Users | Log in as `admin@test.com`. You will see "User Management" in the sidebar and delete buttons on all articles. |
+| **Editor** | Create, View | Log in as `editor@test.com`. You can create articles and view them, but the "Delete" buttons and "User Management" link will be hidden. |
+| **Viewer** | View Only | Log in as `viewer@test.com`. You can only read articles. All "New Article" and "Delete" buttons are hidden. |
 
-## Assumptions
+---
 
-- Passwords are plain text because this is an assignment prototype.
-- Data persistence is in-memory only; restarting backend resets articles.
-- CORS is open for local frontend/backend communication.
+## 🛠️ API Flow Explanation
 
-## Hosted Application
+1. **User Signup**: `POST /signup` -> Validates name/email/password -> Hashes password -> Saves to MongoDB.
+2. **Article Dashboard**: `GET /articles` -> `authenticate` middleware -> Fetch from MongoDB -> Return formatted JSON.
+3. **Article Creation**: `POST /articles` -> `authenticate` -> `authorize(['admin', 'editor'])` -> `Article.create()`.
+4. **User Management**: `GET /users` -> `authenticate` -> `authorize(['admin'])` -> Returns all user profiles (excluding passwords).
 
-This environment does not have direct deployment integration.
-To complete submission requirements, deploy:
+---
 
-- backend (for example Render, Railway, Fly.io)
-- frontend (for example Vercel, Netlify)
+## 📝 Key Assumptions
 
-Then add the live URLs here before final submission.
-
-## Useful Commands
-
-From project root:
-
-- `npm run dev:backend`
-- `npm run dev:frontend`
-- `npm run start:backend`
-- `npm run build:frontend`
+- **Statelessness**: We assume a stateless JWT approach is sufficient for this assignment (no session revocation).
+- **In-App Navigation**: We assume users should be redirected to the Dashboard if they try to access a page they don't have permission for (instead of showing a blank screen).
+- **Default Role**: Any new user signing up via the `/signup` page is automatically assigned the `viewer` role for security reasons.

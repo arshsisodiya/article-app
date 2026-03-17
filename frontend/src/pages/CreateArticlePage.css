@@ -1,0 +1,50 @@
+/* ============================================
+   Create Article Page
+   ============================================ */
+
+.create-article {
+  max-width: 720px;
+  margin: 0 auto;
+  animation: slideUp 0.5s var(--ease-out);
+}
+
+.create-article-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+}
+
+.create-article-card h2 {
+  margin-bottom: 4px;
+}
+
+.create-article-sub {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 28px;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.create-form textarea {
+  min-height: 200px;
+  resize: vertical;
+}
+
+.create-form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .create-article-card {
+    padding: 20px;
+  }
+}
