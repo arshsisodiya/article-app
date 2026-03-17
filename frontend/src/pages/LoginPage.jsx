@@ -24,11 +24,6 @@ export default function LoginPage() {
     }
   }
 
-  function fillDemo(role) {
-    setEmail(`${role}@test.com`);
-    setPassword("password");
-  }
-
   return (
     <div className="auth-page">
       <div className="auth-bg">
@@ -122,22 +117,6 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
-
-          <div className="auth-divider"><span>Demo Accounts</span></div>
-
-          <div className="auth-demo">
-            <div className="auth-demo-buttons">
-              <button className="auth-demo-btn" type="button" onClick={() => fillDemo("admin")}>
-                <span className="badge badge-admin">Admin</span>
-              </button>
-              <button className="auth-demo-btn" type="button" onClick={() => fillDemo("editor")}>
-                <span className="badge badge-editor">Editor</span>
-              </button>
-              <button className="auth-demo-btn" type="button" onClick={() => fillDemo("viewer")}>
-                <span className="badge badge-viewer">Viewer</span>
-              </button>
-            </div>
-          </div>
 
           <p className="auth-switch">
             Don't have an account?{" "}

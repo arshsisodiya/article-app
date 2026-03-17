@@ -103,7 +103,7 @@ Here is the lifecycle of a typical protected request (e.g., Creating an Article)
 
 ## 🧪 How to Test Each Role
 
-Use the **Quick Login** buttons on the login page for instant testing:
+Use the following test accounts to verify role-based behavior:
 
 | Role | Permissions | Testing Instructions |
 |------|-------------|----------------------|
