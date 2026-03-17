@@ -32,7 +32,9 @@ export default function ArticleCard({ article, canDelete, onDelete, onClick, ani
           </button>
         )}
       </div>
-      <div className="article-card-body">{article.content}</div>
+      <div className="article-card-body">
+        <p>{article.content}</p>
+      </div>
       <div className="article-card-footer">
         <div className="article-author">
           <div className="article-author-avatar">
