@@ -8,34 +8,13 @@
  *   - role-derived booleans (canCreate, canDelete, isAdmin)
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { decodeJwtPayload } from "../utils/jwt";
 
 const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const TOKEN_KEY = "rbac_token";
 
 const AuthContext = createContext(null);
 
-/**
- * Decodes the payload of a JWT without verifying the signature.
- * Used to extract user info (id, name, email, role) from a stored token.
- *
- * @param {string} jwt - The JWT string.
- * @returns {object|null} The decoded payload, or null on failure.
- */
-function decodeJwtPayload(jwt) {
-  try {
-    const base64Url = jwt.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
-  } catch {
-    return null;
-  }
-}
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || "");
