@@ -5,6 +5,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000
 const TOKEN_KEY = "rbac_assignment_token";
 
 function App() {
+  const [authMode, setAuthMode] = useState("login");
+  const [name, setName] = useState("");
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || "");
   const [email, setEmail] = useState("admin@test.com");
   const [password, setPassword] = useState("password");
@@ -112,6 +114,35 @@ function App() {
     }
   }
 
+  async function handleSignup(event) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+
+    try {
+      await apiRequest("/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        }),
+      });
+
+      setMessage("Signup successful. You can now login with your new viewer account.");
+      setAuthMode("login");
+      setName("");
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleCreateArticle(event) {
     event.preventDefault();
     setSubmittingArticle(true);
@@ -168,11 +199,39 @@ function App() {
 
       {!token && (
         <section className="panel auth-panel">
-          <h2>Login</h2>
-          <form className="stack" onSubmit={handleLogin}>
+          <div className="auth-tabs" role="tablist" aria-label="Authentication Mode">
+            <button
+              className={authMode === "login" ? "tab active" : "tab"}
+              type="button"
+              onClick={() => setAuthMode("login")}
+            >
+              Login
+            </button>
+            <button
+              className={authMode === "signup" ? "tab active" : "tab"}
+              type="button"
+              onClick={() => setAuthMode("signup")}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          <h2>{authMode === "login" ? "Login" : "Create Viewer Account"}</h2>
+          <form className="stack" onSubmit={authMode === "login" ? handleLogin : handleSignup}>
+            {authMode === "signup" && (
+              <label>
+                Full Name
+                <input value={name} onChange={(event) => setName(event.target.value)} required />
+              </label>
+            )}
             <label>
               Email
-              <input value={email} onChange={(event) => setEmail(event.target.value)} required />
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
             </label>
             <label>
               Password
@@ -184,9 +243,16 @@ function App() {
               />
             </label>
             <button type="submit" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Please wait..." : authMode === "login" ? "Login" : "Create Account"}
             </button>
           </form>
+          {authMode === "signup" && (
+            <ul className="password-hint">
+              <li>Minimum 8 characters</li>
+              <li>At least 1 uppercase and 1 lowercase letter</li>
+              <li>At least 1 number and 1 special character</li>
+            </ul>
+          )}
           <p className="hint">Demo roles: admin@test.com, editor@test.com, viewer@test.com (password: password)</p>
         </section>
       )}

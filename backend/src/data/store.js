@@ -32,6 +32,21 @@ const articles = [
 ];
 
 let nextArticleId = 2;
+let nextUserId = 4;
+
+function createViewerUser({ name, email, password }) {
+  const user = {
+    id: nextUserId,
+    name,
+    email,
+    password,
+    role: "viewer",
+  };
+
+  users.push(user);
+  nextUserId += 1;
+  return user;
+}
 
 function createArticle({ title, content, createdBy }) {
   const article = {
@@ -61,5 +76,6 @@ module.exports = {
   users,
   articles,
   createArticle,
+  createViewerUser,
   deleteArticleById,
 };

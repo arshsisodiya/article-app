@@ -58,6 +58,7 @@ All users use the password `password`.
 
 ### Backend
 
+- `POST /signup`: creates a new user account with `viewer` role.
 - `POST /login`: validates credentials from in-memory users and returns JWT.
 - `GET /articles`: accessible by admin, editor, viewer.
 - `POST /articles`: accessible by admin, editor.
