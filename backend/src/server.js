@@ -17,7 +17,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 /* ---------- Middleware ---------- */
-app.use(cors());
+app.use(cors({
+  origin: "*", // For development/simplicity; consider restricting to frontend URL in production
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 app.use(express.json());
 
 /* ---------- Public Welcome Route ---------- */
